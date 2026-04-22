@@ -10,11 +10,17 @@ GET http://localhost:3000/books
 ### Get one book
 GET http://localhost:3000/books/1
 
-### Update status
-PATCH http://localhost:3000/books/1
+### Full update (title + author + status)
+PUT http://localhost:3000/books/1
 Content-Type: application/json
 
-{ "status": "reading" }
+{ "title": "Dune", "author": "Frank Herbert", "status": "reading" }
+
+### Update status only (for the dropdown)
+PATCH http://localhost:3000/books/1/status
+Content-Type: application/json
+
+{ "status": "finished...good book!" }
 
 ### Delete a book
 DELETE http://localhost:3000/books/1
