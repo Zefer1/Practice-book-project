@@ -1,0 +1,20 @@
+### Add a book
+POST http://localhost:3000/books
+Content-Type: application/json
+
+{ "title": "Dune", "author": "Frank Herbert" }
+
+### Get all books
+GET http://localhost:3000/books
+
+### Get one book
+GET http://localhost:3000/books/1
+
+### Update status
+PATCH http://localhost:3000/books/1
+Content-Type: application/json
+
+{ "status": "reading" }
+
+### Delete a book
+DELETE http://localhost:3000/books/1
