@@ -42,3 +42,9 @@ export function updateBook(id: number, title: string, author: string, status: Bo
     book.status = status;
     return book;
 }
+
+export function updateBookStatus(id: number, status: Book["status"]): Book {
+    const book = getBook(id);
+    book.status = status;
+    return book;
+}

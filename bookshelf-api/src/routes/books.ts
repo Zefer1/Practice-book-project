@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addBook, getBook, getBooks, updateBook, deleteBook } from "../../data.js";
+import { addBook, getBook, getBooks, updateBook, updateBookStatus, deleteBook } from "../../data.js";
 
 const router = Router();
 
@@ -52,7 +52,8 @@ router.get('/books/:id', (req, res) => {
     }
 });
 
-router.patch('/books/:id', (req, res) => {
+// Full update — replaces all fields
+router.put('/books/:id', (req, res) => {
     const id = parseId(req.params.id);
     if (id === null) {
         res.status(400).json({ message: "id must be a positive integer" });
@@ -76,6 +77,28 @@ router.patch('/books/:id', (req, res) => {
 
     try {
         res.json(updateBook(id, title.trim(), author.trim(), status));
+    } catch {
+        res.status(404).json({ message: "Book not found" });
+    }
+});
+
+// Partial update — status only (for the dropdown)
+router.patch('/books/:id/status', (req, res) => {
+    const id = parseId(req.params.id);
+    if (id === null) {
+        res.status(400).json({ message: "id must be a positive integer" });
+        return;
+    }
+
+    const { status } = req.body;
+
+    if (!VALID_STATUSES.includes(status as Status)) {
+        res.status(400).json({ message: `status must be one of: ${VALID_STATUSES.join(", ")}` });
+        return;
+    }
+
+    try {
+        res.json(updateBookStatus(id, status));
     } catch {
         res.status(404).json({ message: "Book not found" });
     }
