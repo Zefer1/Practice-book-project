@@ -12,7 +12,7 @@ let nextId = 1;
 export function addBook(title: string, author: string) {
     const newBook = { id: nextId++, title, author, status: "want to read" as const};
     BOOKS.push(newBook);
-    return newBook
+    return newBook;
 }
 
 export function getBook(id: number) {
@@ -20,24 +20,25 @@ export function getBook(id: number) {
         return book.id === id;
     });
     if(!book) {
-        throw new Error("Book not found! Please check for typos");
+        throw new Error("Book not found");
     }
-    return book
+    return book;
 }
 
 export function getBooks() {
     return BOOKS;
 }
 
-export function removeBook(id: number) {
+export function deleteBook(id: number) {
     BOOKS = BOOKS.filter(function(book){
-        return book.id !== id
-    })
+        return book.id !== id;
+    });
 }
 
-export function updateBook(id:number, title: string, author: string, status: Book["status"]) {
-    const book = getBook(id)
-    book.title = title,
-    book.author = author,
-    book.status = status
+export function updateBook(id: number, title: string, author: string, status: Book["status"]): Book {
+    const book = getBook(id);
+    book.title = title;
+    book.author = author;
+    book.status = status;
+    return book;
 }
