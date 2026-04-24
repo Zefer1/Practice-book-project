@@ -30,9 +30,8 @@ export function getBooks() {
 }
 
 export function deleteBook(id: number) {
-    BOOKS = BOOKS.filter(function(book){
-        return book.id !== id;
-    });
+    getBook(id);
+    BOOKS = BOOKS.filter(book => book.id !== id);
 }
 
 export function updateBook(id: number, title: string, author: string, status: Book["status"]): Book {
