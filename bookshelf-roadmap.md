@@ -232,6 +232,28 @@ npm run dev                    # port 5173
 
 ---
 
+## Phase 9: Styling with Tailwind
+
+### Step 21 — Style `AddBookForm.tsx`
+- Wrap form in a centered container with padding
+- Style inputs: full width, border, rounded corners, padding
+- Style button: background color, text color, hover state
+- Add spacing between elements with `gap` or `mb`
+
+### Step 22 — Style `BookList.tsx`
+- Style the `<ul>` — remove default list styles (`list-none`)
+- Each `<li>` — card look: border, rounded, padding, shadow
+- `<span>` — title bold, author muted color
+- Delete button — red, small
+- Status `<select>` — styled to match the card
+
+### Step 23 — Style `App.tsx` layout
+- Center everything on the page
+- Add a heading for the app
+- Add spacing between the form and the list
+
+---
+
 ## Common Pitfalls
 
 | Problem | Cause | Fix |
