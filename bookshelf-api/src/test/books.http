@@ -24,3 +24,6 @@ Content-Type: application/json
 
 ### Delete a book
 DELETE http://localhost:3000/books/1
+
+### Get books filtered by status
+GET http://localhost:3000/books?status=reading

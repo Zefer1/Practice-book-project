@@ -34,10 +34,12 @@ router.post('/books', (req, res) => {
 });
 
 router.get('/books', (req, res) => {
-    const books = getBooks();
+    const { status } = req.query;
+    const books = status
+        ? getBooks().filter(b => b.status === status)
+        : getBooks();
     res.json({ books });
 });
-
 router.get('/books/:id', (req, res) => {
     const id = parseId(req.params.id);
     if (id === null) {
