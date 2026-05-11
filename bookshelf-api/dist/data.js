@@ -1,36 +1,40 @@
-;
-let BOOKS = [];
-let nextId = 1;
-export function addBook(title, author) {
-    const newBook = { id: nextId++, title, author, status: "want to read" };
-    BOOKS.push(newBook);
-    return newBook;
+import pool from './db/pool.js';
+export async function addBook(title, author) {
+    const result = await pool.query('INSERT INTO books (title, author) VALUES ($1, $2) RETURNING *', [title, author]);
+    return result.rows[0];
 }
-export function getBook(id) {
-    const book = BOOKS.find(function (book) {
-        return book.id === id;
-    });
-    if (!book) {
-        throw new Error("Book not found");
+export async function getBook(id) {
+    const result = await pool.query('SELECT * FROM books WHERE id = $1', [id]);
+    if (result.rows.length === 0) {
+        throw new Error('Book not found');
     }
-    return book;
+    return result.rows[0];
 }
-export function getBooks() {
-    return BOOKS;
+export async function getBooks(status) {
+    if (status) {
+        const result = await pool.query('SELECT * FROM books WHERE status = $1 ORDER BY id ASC', [status]);
+        return result.rows;
+    }
+    const result = await pool.query('SELECT * FROM books ORDER BY id ASC');
+    return result.rows;
 }
-export function deleteBook(id) {
-    getBook(id);
-    BOOKS = BOOKS.filter(book => book.id !== id);
+export async function deleteBook(id) {
+    const result = await pool.query('DELETE FROM books WHERE id = $1', [id]);
+    if (result.rowCount === 0) {
+        throw new Error('Book not found');
+    }
 }
-export function updateBook(id, title, author, status) {
-    const book = getBook(id);
-    book.title = title;
-    book.author = author;
-    book.status = status;
-    return book;
+export async function updateBook(id, title, author, status) {
+    const result = await pool.query('UPDATE books SET title = $1, author = $2, status = $3 WHERE id = $4 RETURNING *', [title, author, status, id]);
+    if (result.rows.length === 0) {
+        throw new Error('Book not found');
+    }
+    return result.rows[0];
 }
-export function updateBookStatus(id, status) {
-    const book = getBook(id);
-    book.status = status;
-    return book;
+export async function updateBookStatus(id, status) {
+    const result = await pool.query('UPDATE books SET status = $1 WHERE id = $2 RETURNING *', [status, id]);
+    if (result.rows.length === 0) {
+        throw new Error('Book not found');
+    }
+    return result.rows[0];
 }
