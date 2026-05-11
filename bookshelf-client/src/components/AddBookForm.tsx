@@ -11,20 +11,22 @@ const inputClass = "w-full bg-white dark:bg-gray-800 border border-gray-300 dark
 export default function AddBookForm({ books, setBooks }: Props) {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
+    const [isbn, setIsbn] = useState('');
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
         e.preventDefault();
 
         fetch('http://localhost:3000/books', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, author })
+            body: JSON.stringify({ title, author, isbn: isbn || undefined })
         })
         .then(res => res.json())
         .then(newBook => {
             setBooks([...books, newBook]);
             setTitle('');
             setAuthor('');
+            setIsbn('');
         });
     }
 
@@ -42,6 +44,12 @@ export default function AddBookForm({ books, setBooks }: Props) {
                     value={author}
                     onChange={e => setAuthor(e.target.value)}
                     placeholder="Author"
+                />
+                <input
+                    className={inputClass}
+                    value={isbn}
+                    onChange={e => setIsbn(e.target.value)}
+                    placeholder="ISBN (optional)"
                 />
                 <button
                     type="submit"
