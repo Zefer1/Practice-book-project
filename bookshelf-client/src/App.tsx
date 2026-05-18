@@ -7,7 +7,7 @@ import RegisterForm from './components/RegisterForm';
 import { useAuth } from './context/AuthContext';
 
 function App() {
-    const { user, token, logout } = useAuth();
+    const { user, token, login, logout } = useAuth();
     const [books, setBooks] = useState<Book[]>([]);
     const [darkMode, setDarkMode] = useState(true);
     const [showRegister, setShowRegister] = useState(false);
@@ -15,6 +15,17 @@ function App() {
     useEffect(() => {
         document.documentElement.classList.toggle('dark', darkMode);
     }, [darkMode]);
+
+    // Handle ?token= from Google OAuth redirect
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const oauthToken = params.get('token');
+        if (oauthToken) {
+            const payload = JSON.parse(atob(oauthToken.split('.')[1]));
+            login(oauthToken, { id: payload.id, email: payload.email });
+            window.history.replaceState({}, '', '/');
+        }
+    }, []);
 
     useEffect(() => {
         if (!token) return;
