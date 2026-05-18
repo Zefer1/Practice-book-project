@@ -32,6 +32,18 @@ export default function LoginForm() {
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <button
+                type="button"
+                onClick={() => { window.location.href = 'http://localhost:3000/auth/google'; }}
+                className="border border-gray-300 rounded px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer text-gray-700 dark:text-gray-300"
+            >
+                Continue with Google
+            </button>
+            <div className="flex items-center gap-2 text-gray-400 text-sm">
+                <hr className="flex-1 border-gray-300 dark:border-gray-600" />
+                or
+                <hr className="flex-1 border-gray-300 dark:border-gray-600" />
+            </div>
             <input
                 type="email"
                 value={email}

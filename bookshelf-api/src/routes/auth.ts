@@ -2,6 +2,8 @@ import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { findUserByEmail, createLocalUser } from '../users.js';
+import passport from '../auth/passport-config.js';
+import type { User } from '../users.js';
 
 const router = Router();
 const SALT_ROUNDS = 10;
@@ -76,5 +78,22 @@ router.post('/auth/login', async (req, res) => {
         res.status(500).json({ message: 'Failed to log in' });
     }
 });
+
+// GET /auth/google — start OAuth flow
+router.get(
+    '/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'], session: false })
+);
+
+// GET /auth/google/callback — Google redirects here
+router.get(
+    '/auth/google/callback',
+    passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth` }),
+    (req, res) => {
+        const user = req.user as User;
+        const token = signToken({ id: user.id, email: user.email });
+        res.redirect(`${process.env.FRONTEND_URL}?token=${token}`);
+    }
+);
 
 export default router;
