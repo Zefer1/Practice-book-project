@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { type Book } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface Props {
     books: Book[];
@@ -9,6 +10,7 @@ interface Props {
 const inputClass = "w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400";
 
 export default function AddBookForm({ books, setBooks }: Props) {
+    const { token } = useAuth();
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [isbn, setIsbn] = useState('');
@@ -18,7 +20,10 @@ export default function AddBookForm({ books, setBooks }: Props) {
 
         fetch('http://localhost:3000/books', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ title, author, isbn: isbn || undefined })
         })
         .then(res => res.json())

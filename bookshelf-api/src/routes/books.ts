@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { addBook, getBook, getBooks, updateBook, updateBookStatus, deleteBook } from "../../data.js";
+import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
 
@@ -12,12 +13,13 @@ const VALID_STATUSES = [
 
 type Status = typeof VALID_STATUSES[number];
 
-function parseId(raw: string): number | null {
-    const id = Number(raw);
+function parseId(raw: string | string[]): number | null {
+    const value = Array.isArray(raw) ? raw[0] : raw;
+    const id = Number(value);
     return Number.isInteger(id) && id > 0 ? id : null;
 }
 
-router.post('/books', async (req, res) => {
+router.post('/books', requireAuth, async (req, res) => {
     const { title, author, isbn } = req.body;
 
     if (typeof title !== "string" || title.trim() === "") {
@@ -32,39 +34,38 @@ router.post('/books', async (req, res) => {
     const isbnValue = typeof isbn === "string" && isbn.trim() !== "" ? isbn.trim() : undefined;
 
     try {
-        const addedBook = await addBook(title.trim(), author.trim(), isbnValue);
+        const addedBook = await addBook(req.user!.id, title.trim(), author.trim(), isbnValue);
         res.status(201).json(addedBook);
     } catch {
         res.status(500).json({ message: "Failed to add book" });
     }
 });
 
-router.get('/books', async (req, res) => {
+router.get('/books', requireAuth, async (req, res) => {
     const { status, sort } = req.query;
     try {
-        const books = await getBooks(status as string | undefined, sort as string | undefined);
+        const books = await getBooks(req.user!.id, status as string | undefined, sort as string | undefined);
         res.json({ books });
     } catch {
         res.status(500).json({ message: "Failed to fetch books" });
     }
 });
 
-router.get('/books/:id', async (req, res) => {
+router.get('/books/:id', requireAuth, async (req, res) => {
     const id = parseId(req.params.id);
     if (id === null) {
         res.status(400).json({ message: "id must be a positive integer" });
         return;
     }
     try {
-        const book = await getBook(id);
+        const book = await getBook(req.user!.id, id);
         res.json(book);
     } catch {
         res.status(404).json({ message: "Book not found" });
     }
 });
 
-// Full update — replaces all fields
-router.put('/books/:id', async (req, res) => {
+router.put('/books/:id', requireAuth, async (req, res) => {
     const id = parseId(req.params.id);
     if (id === null) {
         res.status(400).json({ message: "id must be a positive integer" });
@@ -93,15 +94,14 @@ router.put('/books/:id', async (req, res) => {
     }
 
     try {
-        const updated = await updateBook(id, title.trim(), author.trim(), status, rating ?? null);
+        const updated = await updateBook(req.user!.id, id, title.trim(), author.trim(), status, rating ?? null);
         res.json(updated);
     } catch {
         res.status(404).json({ message: "Book not found" });
     }
 });
 
-// Partial update — status only (for the dropdown)
-router.patch('/books/:id/status', async (req, res) => {
+router.patch('/books/:id/status', requireAuth, async (req, res) => {
     const id = parseId(req.params.id);
     if (id === null) {
         res.status(400).json({ message: "id must be a positive integer" });
@@ -116,21 +116,21 @@ router.patch('/books/:id/status', async (req, res) => {
     }
 
     try {
-        const updated = await updateBookStatus(id, status);
+        const updated = await updateBookStatus(req.user!.id, id, status);
         res.json(updated);
     } catch {
         res.status(404).json({ message: "Book not found" });
     }
 });
 
-router.delete('/books/:id', async (req, res) => {
+router.delete('/books/:id', requireAuth, async (req, res) => {
     const id = parseId(req.params.id);
     if (id === null) {
         res.status(400).json({ message: "id must be a positive integer" });
         return;
     }
     try {
-        await deleteBook(id);
+        await deleteBook(req.user!.id, id);
         res.json({ message: "Book deleted" });
     } catch {
         res.status(404).json({ message: "Book not found" });

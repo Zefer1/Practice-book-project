@@ -1,4 +1,5 @@
 import { type Book } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface Props {
     books: Book[];
@@ -15,16 +16,23 @@ const STATUSES = [
 const selectClass = "bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer";
 
 export default function BookList({ books, setBooks }: Props) {
+    const { token } = useAuth();
 
     function handleDelete(id: number) {
-        fetch(`http://localhost:3000/books/${id}`, { method: 'DELETE' })
+        fetch(`http://localhost:3000/books/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        })
             .then(() => setBooks(books.filter(b => b.id !== id)));
     }
 
     function handleStatusChange(id: number, status: Book['status']) {
         fetch(`http://localhost:3000/books/${id}/status`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify({ status })
         })
         .then(() => {
